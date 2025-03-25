@@ -66,8 +66,8 @@
         "flushConnection": false,
         "securityRules": [
           {
-            "name": "Allow-HTTP",
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups/securityRules', parameters('networkSecurityGroups_webservers_NSG_name'), 'Allow-HTTP')]",
+            "name": "Allow-WEB",
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups/securityRules', parameters('networkSecurityGroups_webservers_NSG_name'), 'Allow-WEB')]",
             "type": "Microsoft.Network/networkSecurityGroups/securityRules",
             "properties": {
               "protocol": "Tcp",
@@ -92,7 +92,29 @@
     {
       "type": "Microsoft.Network/networkSecurityGroups/securityRules",
       "apiVersion": "2024-05-01",
-      "name": "[concat(parameters('networkSecurityGroups_webservers_NSG_name'), '/Allow-HTTP')]",
+      "name": "[concat(parameters('networkSecurityGroups_management_NSG_name'), '/Allow-SSH')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_management_NSG_name'))]"
+      ],
+      "properties": {
+        "protocol": "Tcp",
+        "sourcePortRange": "*",
+        "destinationPortRange": "22",
+        "sourceAddressPrefix": "Internet",
+        "destinationAddressPrefix": "*",
+        "access": "Allow",
+        "priority": 100,
+        "direction": "Inbound",
+        "sourcePortRanges": [],
+        "destinationPortRanges": [],
+        "sourceAddressPrefixes": [],
+        "destinationAddressPrefixes": []
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+      "apiVersion": "2024-05-01",
+      "name": "[concat(parameters('networkSecurityGroups_webservers_NSG_name'), '/Allow-WEB')]",
       "dependsOn": [
         "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_webservers_NSG_name'))]"
       ],
@@ -109,28 +131,6 @@
           "80",
           "443"
         ],
-        "sourceAddressPrefixes": [],
-        "destinationAddressPrefixes": []
-      }
-    },
-    {
-      "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-      "apiVersion": "2024-05-01",
-      "name": "[concat(parameters('networkSecurityGroups_management_NSG_name'), '/Allow-SSH')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_management_NSG_name'))]"
-      ],
-      "properties": {
-        "protocol": "Tcp",
-        "sourcePortRange": "*",
-        "destinationPortRange": "22",
-        "sourceAddressPrefix": "Internet",
-        "destinationAddressPrefix": "*",
-        "access": "Allow",
-        "priority": 100,
-        "direction": "Inbound",
-        "sourcePortRanges": [],
-        "destinationPortRanges": [],
         "sourceAddressPrefixes": [],
         "destinationAddressPrefixes": []
       }

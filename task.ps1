@@ -18,7 +18,7 @@ Write-Host "Creating web network security group..."
 $webNsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Location $location -Name "$webSubnetName-NSG"
 
 # Allow only HTTP/HTTPS traffic from Internet
-$webNsg = Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $webNsg -Name "Allow-HTTP" `
+$webNsg = Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $webNsg -Name "Allow-WEB" `
     -Access Allow -Protocol Tcp -Direction Inbound -Priority 100 -SourceAddressPrefix Internet `
     -SourcePortRange * -DestinationAddressPrefix * -DestinationPortRange 80,443
 
