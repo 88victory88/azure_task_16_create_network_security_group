@@ -33,21 +33,11 @@ $mngNsg = Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $mngNsg -Name "A
     -Access Allow -Protocol Tcp -Direction Inbound -Priority 100 -SourceAddressPrefix Internet `
     -SourcePortRange * -DestinationAddressPrefix * -DestinationPortRange 22
 
-# # Allow internal traffic within VNet
-# $mngNsg = Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $mngNsg -Name "Allow-VNet" `
-#     -Access Allow -Protocol * -Direction Inbound -Priority 120 `
-#     -SourceAddressPrefix VirtualNetwork -SourcePortRange * -DestinationAddressPrefix VirtualNetwork -DestinationPortRange *
-
 Set-AzNetworkSecurityGroup -NetworkSecurityGroup $mngNsg
 
 # --- Creating Database NSG ---
 Write-Host "Creating database network security group..."
 $dbNsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Location $location -Name "$dbSubnetName-NSG"
-
-# Allow internal traffic within VNet
-# $dbNsg = Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $dbNsg -Name "Allow-VNet" `
-#     -Access Allow -Protocol * -Direction Inbound -Priority 120 `
-#     -SourceAddressPrefix VirtualNetwork -SourcePortRange * -DestinationAddressPrefix VirtualNetwork -DestinationPortRange *
 
 Set-AzNetworkSecurityGroup -NetworkSecurityGroup $dbNsg
 
