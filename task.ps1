@@ -13,6 +13,16 @@ $mngSubnetIpRange = "10.20.30.128/26"
 Write-Host "Creating a resource group $resourceGroupName ..."
 New-AzResourceGroup -Name $resourceGroupName -Location $location
 
+# --- Creating NSGs before subnets ---
+Write-Host "Creating web network security group..."
+$webNsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Location $location -Name "$webSubnetName-NSG"
+
+Write-Host "Creating management network security group..."
+$mngNsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Location $location -Name "$mngSubnetName-NSG"
+
+Write-Host "Creating database network security group..."
+$dbNsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Location $location -Name "$dbSubnetName-NSG"
+
 # --- Creating Virtual Network and Subnets ---
 Write-Host "Creating a virtual network ..."
 $webSubnet = New-AzVirtualNetworkSubnetConfig -Name $webSubnetName -AddressPrefix $webSubnetIpRange -NetworkSecurityGroupId $webNsg.Id
@@ -21,10 +31,7 @@ $mngSubnet = New-AzVirtualNetworkSubnetConfig -Name $mngSubnetName -AddressPrefi
 
 New-AzVirtualNetwork -Name $virtualNetworkName -ResourceGroupName $resourceGroupName -Location $location -AddressPrefix $vnetAddressPrefix -Subnet $webSubnet,$dbSubnet,$mngSubnet
 
-# --- Creating Web NSG ---
-Write-Host "Creating web network security group..."
-$webNsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Location $location -Name "$webSubnetName-NSG"
-
+# --- Configuring NSG rules ---
 # Allow only HTTP/HTTPS traffic from Internet
 $webNsg = Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $webNsg -Name "Allow-WEB" `
     -Access Allow -Protocol Tcp -Direction Inbound -Priority 100 -SourceAddressPrefix Internet `
@@ -32,19 +39,11 @@ $webNsg = Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $webNsg -Name "A
 
 Set-AzNetworkSecurityGroup -NetworkSecurityGroup $webNsg
 
-# --- Creating Management NSG ---
-Write-Host "Creating management network security group..."
-$mngNsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Location $location -Name "$mngSubnetName-NSG"
-
 # Allow SSH from Internet
 $mngNsg = Add-AzNetworkSecurityRuleConfig -NetworkSecurityGroup $mngNsg -Name "Allow-SSH" `
     -Access Allow -Protocol Tcp -Direction Inbound -Priority 100 -SourceAddressPrefix Internet `
     -SourcePortRange * -DestinationAddressPrefix * -DestinationPortRange 22
 
 Set-AzNetworkSecurityGroup -NetworkSecurityGroup $mngNsg
-
-# --- Creating Database NSG ---
-Write-Host "Creating database network security group..."
-$dbNsg = New-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Location $location -Name "$dbSubnetName-NSG"
 
 Set-AzNetworkSecurityGroup -NetworkSecurityGroup $dbNsg
